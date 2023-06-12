@@ -158,6 +158,20 @@ class ValuePair {
 }
 
 
+function verifyRemoveSideEffect(key, position){
+  const hash = this.hashCode(key);
+  let index = position+1;
+  while(this.table[index] != null){
+    const posHash = this.hashCode(this.table[index].key)
+    if(posHash <= hash || posHash <= position){
+      this.table[position] = this.table[index];
+      delete this.table[index];
+      position = index;
+    }
+    index ++;
+  }
+}
+
 class HashTable{
   constructor(toStrFn = defaultToString){
     this.toStrFn = toStrFn;
@@ -180,6 +194,7 @@ class HashTable{
     return hash%37;
   }
 
+  /* this used separed chaining
   put(key, value){
     if(key != null && value != null){
       const position = this.hashCode(key);
@@ -190,9 +205,70 @@ class HashTable{
       return true
     }
     return false
+  } */
+
+  put(key,value){
+    if(key != null && value != null ){
+      const position = this.hashCode(key)
+      if(this.table[position] == null){
+        this.table[position] == new ValuePair(key,value);
+      } else {
+        let index = position + 1
+        while(this.table[index]!= null){
+          index ++;
+        }
+        this.table[index]= new ValuePair(key,value);
+      }
+      return true
+    }
+    return false
   }
 
+
   get(key){
+    const position = this.hashCode(key);
+    if(this.table[position] != null ){
+      if(this.table[position.key === key]){
+        return this.table[position].value;
+      }
+      let index = position + 1;
+      while(this.table[index].key != key && this.table[index] != null){
+        index++;
+      }
+
+      if(this.table[index] != null && this.table[index].key == key){
+        return this.table[index].value;
+      }
+
+    }
+    return undefined
+  }
+
+  remove(key){
+    const position = this.hashCode(key);
+    if(this.table[position] != null ){
+      if(this.table[position.key === key]){
+        delete this.table[position];
+        this.verifyRemoveSideEffect(key, position)
+        return true
+      }
+      let index = position + 1;
+      while(this.table[index].key != key && this.table[index] != null){
+        index++;
+      }
+
+      if(this.table[index] != null && this.table[index].key == key){
+        delete this.table[position];
+        this.verifyRemoveSideEffect(key, position)
+        return true
+      }
+
+    }
+    return undefined
+  }
+
+  /* this used separed chaining
+   get(key){
     const position = this.hashCode(key);
     const linkedList = this.table[position];
     if(linkedList != null && !linkedList.isEmpty()){
@@ -205,8 +281,9 @@ class HashTable{
       }
     }
     return undefined;
-  }
+  } */
 
+  /* this used separed chaining
   remove(key){
     const position = this.hashCode(key);
     const linkedList = this.table[position];
@@ -225,7 +302,7 @@ class HashTable{
       }
     }
     return false
-  }
+  } */
 
   toString(){
     if(Object.values(this.table).length == 0){
@@ -240,14 +317,7 @@ class HashTable{
   }
 }
 
-const jsonDates = async() => {
-  const dates = await fetch('http://localhost:1337/api/pages?populate[sections][populate]=*')
-  const json = await dates.json()
-  console.log(JSON.stringify(json.data[0]))
-  console.log(JSON.parse(JSON.stringify(json.data[0].attributes)))
-}
 
-jsonDates()
 
 // const myHash = new HashTable()
 
