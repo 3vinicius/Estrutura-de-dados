@@ -50,7 +50,47 @@ class BinarySearchTree{
       }
     }
   }
-/*This is my inOrderTraverse using if and else
+
+  inOrderTraverse(callback){
+    this.inOrderTraverseNode(this.root, callback)
+  }
+
+  inOrderTraverseNode(node, callback){
+    if(node != null){
+      this.inOrderTraverseNode(node.left,callback);
+      callback(node.key);
+      this.inOrderTraverseNode(node.right,callback);
+    }
+  }
+
+  preOrderTraverse(callback){
+    this.preOrderTraverseNode(this.root,callback)
+  }
+
+  preOrderTraverseNode(node,callback){
+    if(node != null){
+      callback(node.key)
+      this.preOrderTraverseNode(node.left,callback)
+      this.preOrderTraverseNode(node.right,callback)
+    }
+  }
+
+  posOrderTraverse(callback){
+    this.posOrderTraverseNode(this.root,callback)
+  }
+
+  posOrderTraverseNode(node, callback){
+    if(node != null){
+      this.posOrderTraverseNode(node.left,callback);
+      this.posOrderTraverseNode(node.right,callback);
+      callback(node.key);
+    }
+  }
+
+  
+  /* /// My methodos for preOrder inorder using if and else
+  This is my inOrderTraverse. Is not necessary if else using...
+
   inOrderTraverse(node = this.root){
     if(node.left == null){
       console.log(node.key)
@@ -61,29 +101,51 @@ class BinarySearchTree{
     if(node.right != null){
       this.inOrderTraverse(node.right);
     }
-  } */
+  }
+
+  preOrderTraverse(node = this.root){
+    if(node.left == null){
+      console.log(node.key)
+    } else {
+      console.log(node.key)
+      this.preOrderTraverse(node.left);
+    }
+    if(node.right != null){
+      this.preOrderTraverse(node.right);
+    }
+  }  */
 
 
 }
 
-const tree = new BinarySearchTree();
-
-tree.insert(11)
-tree.insert(7);
-tree.insert(5);
-tree.insert(3);
-tree.insert(6);
-tree.insert(9)
-tree.insert(8);
-tree.insert(10);
-tree.insert(15);
-tree.insert(13);
-tree.insert(12);
-tree.insert(14);
-tree.insert(20)
-tree.insert(18);
-tree.insert(25);
 
 
-console.log(tree.root);
-tree.inOrderTraverse()
+function createTree() {
+  const tree = new BinarySearchTree();
+  tree.insert(11)
+  tree.insert(7)
+  tree.insert(5)
+  tree.insert(3)
+  tree.insert(6)
+  tree.insert(9)
+  tree.insert(8)
+  tree.insert(10)
+  tree.insert(15)
+  tree.insert(13)
+  tree.insert(12)
+  tree.insert(14)
+  tree.insert(20)
+  tree.insert(18)
+  tree.insert(25)
+
+  return tree;
+}
+const tree = createTree()
+
+//my callback for functions inOrder and inOrder
+const callback = (value) => console.log(value)
+tree.posOrderTraverse(callback);
+
+
+
+//preOrdem
