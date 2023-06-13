@@ -50,31 +50,40 @@ class BinarySearchTree{
       }
     }
   }
-  preOrderTraverse(node = this.root){
+/*This is my inOrderTraverse using if and else
+  inOrderTraverse(node = this.root){
     if(node.left == null){
       console.log(node.key)
-
     } else {
-      this.preOrderTraverse(node.left);
+      this.inOrderTraverse(node.left);
       console.log(node.key)
-      if(node.right != null){
-        console.log(node.right.key)
-        this.preOrderTraverse(node.right);
-      }
     }
-  }
+    if(node.right != null){
+      this.inOrderTraverse(node.right);
+    }
+  } */
+
+
 }
 
 const tree = new BinarySearchTree();
 
-tree.insert(3)
-tree.insert(1);
-tree.insert(0);
+tree.insert(11)
+tree.insert(7);
+tree.insert(5);
+tree.insert(3);
+tree.insert(6);
+tree.insert(9)
+tree.insert(8);
 tree.insert(10);
-tree.insert(-10);
-tree.insert(2)
+tree.insert(15);
+tree.insert(13);
+tree.insert(12);
+tree.insert(14);
+tree.insert(20)
+tree.insert(18);
 tree.insert(25);
-tree.insert(20);
+
 
 console.log(tree.root);
-tree.preOrderTraverse()
+tree.inOrderTraverse()
