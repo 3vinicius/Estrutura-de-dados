@@ -87,7 +87,50 @@ class BinarySearchTree{
     }
   }
 
-  
+  min(){
+    return this.minNode(this.root);
+  }
+
+  max(){
+    return this.maxNode(this.root);
+  }
+
+  minNode(node){
+    let current = node;
+    while(current != null && current.left!=null){
+      current = current.left;
+    }
+    return current.key;
+  }
+
+  maxNode(node){
+    let current = node;
+    while(current != null && current.right!=null){
+      current = current.right;
+    }
+    return current.key;
+  }
+
+  search(key){
+    return this.searchNode(this.root,key);
+  }
+
+  searchNode(node,key){
+    if(node == null){
+      return false
+    }
+
+    if(this.compareFn(key,node.key) === Compare.LESS_THAN){
+      return this.searchNode(node.left,key);
+    } else if(this.compareFn(key,node.key) === Compare.BIGGER_THAN){
+      return this.searchNode(node.right,key);
+    } else {
+      return true;
+    }
+  }
+
+
+
   /* /// My methodos for preOrder inorder using if and else
   This is my inOrderTraverse. Is not necessary if else using...
 
@@ -113,9 +156,81 @@ class BinarySearchTree{
     if(node.right != null){
       this.preOrderTraverse(node.right);
     }
-  }  */
+  }
+
+  // My methods min() and max()
+
+  min(){
+    let current = this.root;
+    while (current.left != null) {
+      current = current.left;
+    }
+    console.log(current.key);
+  }
+
+  max(){
+    let current = this.root;
+    while (current.right != null) {
+      current = current.right;
+    }
+    console.log(current.key);
+  }
+
+  // My method search
 
 
+  searchNode(node,key){
+
+    let current = node;
+    if(current != null){
+      let value;
+    if(current.key == key){
+      return true;
+    }
+    value = this.searchNode(current.left,key)
+    value = this.searchNode(current.right,key)
+    return value;
+  }
+  }
+
+  */
+
+  remove(key){
+    this.root = this.removeNode(this.root, key)
+  }
+
+  removeNode(node, key){
+    if(node == null){
+      return undefined;
+    }
+
+    if(this.compareFn(key,node.key) === Compare.LESS_THAN){
+        node.left = this.removeNode(node.left,key);
+        return node;
+    } if(this.compareFn(key,node.key) === Compare.LESS_THAN){
+        node.right = this.removeNode(node.right,key)
+        return node;
+    }
+
+    if(node.left == null && node.right == null){
+        node = undefined;
+        return node;
+      }
+
+      if(node.left == null){
+        node = node.right
+        return node;
+      } if(node.right == null){
+        node = node.left
+        return node;
+      }
+
+      const aux = this.minNode(node.right);
+      node.key = aux.key;
+      node.right = this.removeNode(node.right, aux.key);
+      return node;
+
+  }
 }
 
 
@@ -142,10 +257,12 @@ function createTree() {
 }
 const tree = createTree()
 
-//my callback for functions inOrder and inOrder
+// my callback for functions inOrder and inOrder
 const callback = (value) => console.log(value)
-tree.posOrderTraverse(callback);
+
+tree.remove(18)
+tree.inOrderTraverse(callback)
 
 
+// console.log(tree.inOrderTraverse(e => console.log(e)))
 
-//preOrdem
