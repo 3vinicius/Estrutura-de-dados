@@ -199,44 +199,42 @@ class BinarySearchTree{
     this.root = this.removeNode(this.root, key);
   }
 
-  removeNode(node, key) {
+   removeNode(node, key) {
     if (node == null) {
       return undefined;
     }
-    if (this.compareFn(key, node.key) === Compare.LESS_THAN) {
-      node.left = this.removeNode(node.left, key);
-      return node;
-    } if (this.compareFn(key, node.key) === Compare.BIGGER_THAN) {
-      node.right = this.removeNode(node.right, key);
-      return node;
+
+    if(this.compareFn(key,node.key) === Compare.LESS_THAN){
+        node.left = this.removeNode(node.left,key);
+        return node;
+    } if(this.compareFn(key,node.key) === Compare.BIGGER_THAN){
+        node.right = this.removeNode(node.right,key)
+        return node;
     }
-    // key is equal to node.item
-    // handle 3 special conditions
-    // 1 - a leaf node
-    // 2 - a node with only 1 child
-    // 3 - a node with 2 children
-    // case 1
-    if (node.left == null && node.right == null) {
-      node = undefined;
+
+      if(node.left == null && node.right == null){
+        node = undefined;
+        return node;
+      }
+      if(node.left == null){
+        node = node.right
+        return node;
+      } if(node.right == null){
+        node = node.left
+        return node;
+      }
+
+      const aux = this.minNode(node.right);
+      node.key = aux.key;
+      node.right = this.removeNode(node.right, aux.key);
       return node;
-    }
-    // case 2
-    if (node.left == null) {
-      node = node.right;
-      return node;
-    } if (node.right == null) {
-      node = node.left;
-      return node;
-    }
-    // case 3
-    const aux = this.minNode(node.right);
-    node.key = aux.key;
-    node.right = this.removeNode(node.right, aux.key);
-    return node;
+
   }
 }
 
 
+
+/*
 
 function createTree() {
   const tree = new BinarySearchTree();
@@ -258,6 +256,7 @@ function createTree() {
 
   return tree;
 }
+
 const tree = createTree()
 
 // my callback for functions inOrder and inOrder
@@ -269,3 +268,4 @@ tree.inOrderTraverse(callback)
 
 // console.log(tree.inOrderTraverse(e => console.log(e)))
 
+ */
