@@ -3,7 +3,7 @@
 const Compare = {
   EQUALS: 0,
   LESS_THAN: -1,
-  BIGGER_THAN: 1
+  BIGGER_THAN: 1,
 };
 
 function defaultCompare(a, b) {
@@ -233,170 +233,200 @@ class BinarySearchTree {
 }
 
 const BalanceFactor = {
-    UNBALANCE_RIGHT: 1,
-    SLIGHTLY_UNBALANCED_RIGHT: 2,
-    BALANCED: 3,
-    SLIGHTLY_UNBALANCED_LEFT: 4,
-    UNBALANCE_LEFT: 5,
+  UNBALANCE_RIGHT: 1,
+  SLIGHTLY_UNBALANCED_RIGHT: 2,
+  BALANCED: 3,
+  SLIGHTLY_UNBALANCED_LEFT: 4,
+  UNBALANCE_LEFT: 5,
+};
+
+const Colors = {
+  BlACK: "BLACK",
+  RED: "RED",
+};
+/* Rulues
+
+  1- root is black
+  2- black folhas
+  3- if node is red, yours children has red
+  4- Does not have two nodes reds adjacnetes
+  5- path your children null has number igualite black nodes
+*/
+
+class RedBlackNode extends Node {
+  constructor(key) {
+    super(key);
+    this.key = key;
+    this.color = Colors.RED;
+    this.parent = null;
+  }
+
+  isRed() {
+    return this.color === Colors.RED;
+  }
 }
 
-class AVLTree extends BinarySearchTree {
+class RedBlackTree extends BinarySearchTree {
   constructor(compareFn = defaultCompare) {
-    super(compareFn);
+    super();
     this.compareFn = compareFn;
     this.root = null;
   }
 
-  getNodeHeight(node){
-    if(node == null){
-      return -1
+  insert(key) {
+    if (this.root === null) {
+      this.root = new RedBlackNode(key);
+      this.root.color = Colors.BlACK;
+    } else {
+      const newNode = this.insertNode(this.root, key);
+      this.fixTreeProperties(newNode);
     }
-
-    return Math.max(this.getNodeHeight(node.right),this.getNodeHeight(node.left))+1;
   }
 
-  getBalanceFactor(node){
-    const HightDifffer = this.getNodeHeight(node.left) - this.getNodeHeight(node.right);
-    switch (HightDifffer) {
-      case -2:
-        return BalanceFactor.UNBALANCE_RIGHT
-
-      case -1:
-        return BalanceFactor.SLIGHTLY_UNBALANCED_RIGHT;
-
-      case 1:
-        return BalanceFactor.SLIGHTLY_UNBALANCED_LEFT;
-
-      case 2:
-        return BalanceFactor.UNBALANCE_LEFT
-
-      default:
-        return BalanceFactor.BALANCED;
+  insertNode(node, key) {
+    if (this.compareFn(key, node.key) === Compare.LESS_THAN) {
+      if (node.left == null) {
+        node.left = new RedBlackNode(key);
+        node.left.parent = node;
+        return node.left;
+      } else {
+        return this.insertNode(node.left, key);
+      }
+    } else if (node.right == null) {
+      node.right = new RedBlackNode(key);
+      node.right.parent = node;
+      return node.right;
+    } else {
+      return this.insertNode(node.right, key);
     }
+  }
+
+  fixTreeProperties(node) {
+    while (
+      node &&
+      node.parent &&
+      //node.parent.color.isRed()
+      node.parent.isRed() &&
+      node.color !== Colors.BlACK
+    ) {
+      let parent = node.parent;
+      const grandParent = parent.parent;
+      // case A: father is childres left
+      if (grandParent && grandParent.left == parent) {
+        const uncle = grandParent.right;
+
+        // case 1A: uncle has color.RED - recolor
+        if (uncle && uncle.color === Colors.RED) {
+          grandParent.color = Colors.RED;
+          parent.color = Colors.BlACK;
+          uncle.color = Colors.BlACK;
+          node = grandParent;
+        } else {
+          // Case 2A: node is child left
+          if(node === parent.right ){
+            this.rotationRR(parent);
+            node = parent
+            parent = node.parente
+          }
+          // Case 3A: node is child right
+          this.rotationLL(grandParent)
+          parent.color = Colors.BlACK;
+          grandParent.color = Colors.RED;
+          node = parent;
+        }
+      } else {
+        // Case B: father is child right
+        const uncle = grandParent.left
+        // Case 1B: uncle is red
+        if (uncle && uncle.color === Colors.RED) {
+          grandParent.color = Colors.RED;
+          parent.color = Colors.BlACK;
+          uncle.color = Colors.BlACK;
+          node = grandParent;
+        } else {
+          // Case 2B: node is child left
+          if(parent.left === node){
+            this.rotationLL(parent);
+            node = parent
+            parent = node.parent
+          }
+          // Case 3B: node is child right
+          this.rotationRR(grandParent);
+          parent.color = Colors.BlACK;
+          grandParent.color = Colors.RED;
+          node = parent;
+        }
+      }
+    }
+    this.root.color = Colors.BlACK;
   }
 
   rotationLL(node){
-    const current = node.left;
-    node.left = current.right;
-    current.right = node;
-    return current;
+    const temp = node.left;
+    node.left = temp.right;
+    if (temp.right && temp.right.key){
+      temp.right.parent = node
+    }
+    temp.parent = node.parent
+    if(!node.parent){
+      this.root = temp;
+    }
+    else {
+      if(node === node.parent.left){
+        node.parent.left = temp
+      } else {
+        node.parent.right = temp
+      }
+    }
+    temp.right = node;
+    node.parent = temp;
   }
 
   rotationRR(node){
-    const current = node.right;
-    node.right = current.left;
-    current.left = node;
-    return current;
-  }
-
-  rotationLR(node){
-    node.left =  this.rotationRR(node.left)
-    return node = this.rotationLL(node)
-  }
-
-  rotationRL(node){
-    node.right =  this.rotationLL(node.right)
-    return node = this.rotationRR(node)
-  }
-
-  insert(key){
-    this.root = this.insertNode(this.root, key)
-  }
-
-  insertNode(node, key){
-    if(node == null){
-      return new Node(key)
-    } else if( this.compareFn(key, node.key) === Compare.LESS_THAN){
-      node.left = this.insertNode(node.left, key)
-    } else if( this.compareFn(key, node.key) === Compare.BIGGER_THAN ){
-      node.right = this.insertNode(node.right, key)
+    const temp = node.right;
+    node.right = temp.left;
+    if(temp.left && temp.left.key){
+      temp.left.parent = node;
+    }
+    temp.parent = node.parent;
+    if(!node.parent){
+      this.root = temp
     } else {
-      return node;
-    }
-
-    // Verication
-
-    const balanceFator = this.getBalanceFactor(node)
-    if(balanceFator === BalanceFactor.UNBALANCE_LEFT){
-      if(this.compareFn(key, node.left.key) === Compare.LESS_THAN){
-        node = this.rotationLL(node);
+      if(node === node.parent.left){
+        node.parent.left = temp;
       } else {
-        node = this.rotationLR(node);
+        node.parent.right = temp;
       }
     }
-
-    if (balanceFator === BalanceFactor.UNBALANCE_RIGHT) {
-      if(this.compareFn(key,node.right.keu) === Compare.BIGGER_THAN){
-        node = this.rotationRR(node)
-      } else {
-        node = this.rotationRL(node)
-      }
-    }
-    return node;
-  }
-
-  removeNode(node, key){
-    node = super.removeNode(node,key)
-    if(node === null){
-      return node
-    }
-
-    const balanceFactor = this.getBalanceFactor(node)
-    if(balanceFactor === BalanceFactor.UNBALANCE_LEFT){
-      const balanceFactorLeft = this.getBalanceFactor(node.left)
-      if( balanceFactorLeft === BalanceFactor.BALANCED || balanceFactorLeft === BalanceFactor.SLIGHTLY_UNBALANCED_LEFT){
-        return this.rotationLL(node)
-      }
-      if(balanceFactorLeft === BalanceFactor.SLIGHTLY_UNBALANCED_RIGHT){
-        return this.rotationLR(node)
-      }
-    }
-
-    if (balanceFactor === BalanceFactor.UNBALANCE_RIGHT){
-      const balanceFactorRigt = this.getBalanceFactor(node.right)
-      if (balanceFactorRigt === BalanceFactor.BALANCED || balanceFactorRigt === BalanceFactor.SLIGHTLY_UNBALANCED_RIGHT){
-        return this.rotationRR(node)
-      }
-      if(balanceFactorRigt === BalanceFactor.SLIGHTLY_UNBALANCED_LEFT){
-        return this.rotationRL(node)
-      }
-    }
-    return node;
+    temp.left = node;
+    node.parent = temp;
   }
 }
 
+function createRedBlack() {
+  const tree = new RedBlackTree();
+  tree.insert(11);
+  tree.insert(7);
+  tree.insert(5);
+  tree.insert(3);
+  tree.insert(6);
+  tree.insert(9);
+  tree.insert(8);
+  tree.insert(10);
+  tree.insert(15);
+  tree.insert(13);
+  tree.insert(12);
+  tree.insert(14);
+  tree.insert(20);
+  tree.insert(18);
+  tree.insert(25);
 
-/*
-
-function createAVL() {
-  const AVL = new AVLTree();
-  AVL.insert(3);
-  AVL.insert(5);
-  AVL.insert(6);
-  AVL.insert(7);
-  AVL.insert(8);
-  AVL.insert(9);
-  AVL.insert(10);
-  AVL.insert(11);
-  AVL.insert(12);
-  AVL.insert(13);
-  AVL.insert(14);
-  AVL.insert(15);
-  AVL.insert(16);
-  AVL.insert(17);
-  AVL.insert(20);
-  return AVL;
+  return tree;
 }
 
-const AVL = createAVL();
+const tree = createRedBlack()
 
-AVL.remove(18)
+console.log(tree);
 
-function array() {
-  let c = []
-  AVL.inOrderTraverse(x => c.push(x));
-  console.log(c);
-}
 
-array()
- */
+
