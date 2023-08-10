@@ -5,7 +5,7 @@ function defaultToString(item) {
     return 'NULL'
   } else if (item === undefined){
     return 'UNDEFINED'
-  } else if( typeof items === 'string' || item instanceof String) {
+  } else if( typeof item === 'string' || item instanceof String) {
     return `${item}`
   }
   return item.toString();
@@ -22,7 +22,7 @@ class ValuePair {
   }
 }
 
-class Dictionary {
+export class Dictionary {
   constructor(toStrFn = defaultToString){
     this.toStrFn = toStrFn;
     this.table = {}
@@ -105,9 +105,6 @@ class Dictionary {
     return stringValues;
   }
 }
-
-
-
 
 
 
